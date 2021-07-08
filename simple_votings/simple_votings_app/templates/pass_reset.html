@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block main %}
+    <div class="card text-center mt-3 w-50 mx-auto">
+
+        <div class="card-body">
+            <form method="post" >
+                <style>
+                    .asteriskField {
+                        display: none;
+                    }
+                </style>
+                {% csrf_token %}
+                {{ form|crispy }}
+                <input type="submit" class="btn btn-primary mt-4" value="Запросить новый пароль">
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends  'base.html' %}
+<script src="popper.js"></script>
+
+{% block main %}
+    <div class="card mt-3">
+        <h2 class="card-header">Список голосований</h2>
+        <div class="card-body">
+            {% if votings %}
+                {% for voting in votings %}
+                    <a href="/voting/{{ voting.id }}/" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="text-dark mb-0">{{ voting.text }}</h5>
+
+                            <style>
+                                .child-mb-0 {
+                                    min-width: 90px;
+                                }
+                                .child-mb-0 * {
+                                    margin-bottom: 0;
+                                }
+                            </style>
+
+                            <div class="d-flex child-mb-0 ml-3">
+                                <p class="text-danger mr-2"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Лайки">&hearts; {{ voting.likes_count }}</p>
+                                <p class="text-muted mr-1"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Комментарии">&#9993; {{ voting.comments_count }}</p>
+                                <p class="text-primary"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title="Голоса">&#10003; {{ voting.votes_count }}</p>
+                            </div>
+
+                        </div>
+                        <small class="text-muted">
+                            Тип голосования {{ voting.type }}.
+                            Создано {{ voting.start_time }}.
+                            {% if voting.end_time %}
+                                Заканчивается {{ voting.end_time }}.
+                            {% endif %}
+                        </small>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <h3>Голосований нет.</h3>
+            {% endif %}
+        </div>
+    </div>
+
+
+{% endblock %}
+

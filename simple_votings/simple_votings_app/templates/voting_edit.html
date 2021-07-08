@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="card mt-3">
+        <div class="card-header text-center">
+            Редактирование голосования
+        </div>
+        <div class="card-body">
+            {% if user == voting.user or user.is_superuser %}
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group w-75 mx-auto">
+                            {% if errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    <ul>
+                                        {% for i in errors %}
+                                            <li>{{ i }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            <form method="post" action="/voting/{{ voting.id }}/edit/">
+                                {% csrf_token %}
+                                <input type="text" class="form-control" placeholder="Ваш опрос" name="question"
+                                       value="{{ voting.text }}">
+                                <div id="common_div" class="mt-3">
+                                    {% for answer in voting.answers %}
+                                        <div class="input-group mb-3 w-75" id="answer">
+                                            <input type="text" class="form-control" name="answer"
+                                                   placeholder="Ваш ответ"
+                                                   value="{{ answer.text }}">
+                                            <div class="input-group-append">
+                                                <input type="button" class="btn btn-outline-danger" value="-"
+                                                       onclick="remove_ans(this)">
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+
+                                <input type="button" onclick="add()" value="+"
+                                       class="btn btn-outline-success mt-2 btn-block">
+                                <hr>
+                                <input type="date" class="form-control" placeholder="Дата окончания" name="end_time"
+                                        {% if voting.end_time %}
+                                       value="{{ voting.get_end_time }}"
+                                        {% endif %}>
+                                <small>Не обязательное поле</small><br>
+                                <input type="checkbox" name="is_multiple" class="mt-3"
+                                        {% if voting.is_multiple %}
+                                       checked
+                                        {% endif %}
+                                >
+                                <span>Разрешить множественный выбор<br></span>
+                                <input type="checkbox" name="is_anonymous_allowed" class="mt-3"
+                                        {% if voting.is_anonymous_allowed %}
+                                       checked
+                                        {% endif %}
+                                >
+                                <span>Разрешить анонимное голосование</span>
+                                <hr>
+                                <input type="submit" class="btn btn-primary" value="Сохранить">
+                            </form>
+                            <form method="post" action="/delete/{{ voting.id }}/">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-danger mt-4" value="Удалить голосование">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <h5>Вы не можете редактировать данное голосование.</h5>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        function add() {
+            if (common_div.children.length < 25) {
+                let el = document.getElementById('answer').cloneNode(true);
+                el.children[0].value = '';
+                common_div.appendChild(el);
+            }
+        }
+
+        function remove_ans(obj) {
+            if (common_div.children.length > 2) {
+                obj.parentNode.parentNode.remove();
+            }
+        }
+    </script>
+{% endblock %}

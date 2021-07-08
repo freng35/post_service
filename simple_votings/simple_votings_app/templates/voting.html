@@ -1,0 +1,119 @@
+{% extends  'base.html' %}
+
+{% block main %}
+    <div class="card mt-3">
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <h4 class="text-left">{{ voting.text }}</h4>
+                </div>
+                <div class="col text-right">
+                    {% if voting.user == user or user.is_superuser %}
+                        <a href="/voting/{{ voting.id }}/edit" class="btn btn-sm btn-primary">Редактировать</a>
+                    {% else %}
+                        <a href="/voting/{{ voting.id }}/send_report/"
+                           class="btn btn-sm btn-primary">Пожаловаться</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% for answer in voting.answers %}
+                <hr>
+                <form method="post" action="{{ answer.action }}">
+                    {% csrf_token %}
+                    <input type="submit" value="{{ answer.text }} - Проголосовало {{ answer.votes_count }}"
+                            {% if not voting.is_multiple %}
+                                {% if voted_answers %}
+                                    {% if answer in voted_answers %}
+                                        class="btn btn-block text-left btn-primary" disabled
+                                    {% else %}
+                                        class="btn btn-block text-left btn-outline-primary " disabled
+                                    {% endif %}
+                                {% else %}
+                                    class="btn btn-block text-left btn-outline-primary"
+                                    {% if voting.is_ended %}
+                                        disabled
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                {% if answer in voted_answers %}
+                                    class="btn btn-block text-left btn-primary" disabled
+                                {% else %}
+                                    class="btn btn-block text-left btn-outline-primary"
+                                    {% if voting.is_ended %}
+                                        disabled
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                    >
+                </form>
+            {% endfor %}
+        </div>
+         <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <style>
+                        .text-muted {
+                            margin-right: 10px;
+                        }
+                    </style>
+
+                    <span class="text-muted">
+                        Создатель <a href="/profile/{{ voting.user.id }}/">{{ voting.user.username }}</a>
+                    </span>
+                    <span class="text-muted">Создан {{ voting.start_time }}</span>
+                    {% if voting.end_time %}
+                        <span class="text-muted">Заканчивается {{ voting.end_time }}</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <form method="post" action="{{ voting.like }}" class="hr" style="float: left; margin: 0px;">
+                        {% csrf_token %}
+
+                        {% if liked_by_user %}
+                            <input type="submit" value="♥ {{ voting.likes_count }}" class="btn btn-danger"
+                                   style="padding: 1px 10px;">
+                        {% else %}
+                            <input type="submit" value="♥ {{ voting.likes_count }}" class="btn btn-outline-danger"
+                                   style="padding: 1px 10px;">
+                        {% endif %}
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+
+    <hr style="margin: 0px;">
+
+    <div class = "card mt-3">
+        <div class="card-body">
+        <h3>Добавить комментарий:</h3>
+        <form method="post" action="/voting/{{ voting.id }}/">
+            {% csrf_token %}
+            {{ form.comment }}
+            <input class="btn btn-primary" type="submit" value="Оставить комментарий">
+        </form>
+        <h3>Комментарии:</h3>
+        {% if voting.comments %}
+            {% for comment in voting.comments %}
+
+                <div class="media" style="margin: 20px; border-style: outset">
+                    <img src="{{ MEDIA_URL }}{{ comment.user.profile.avatar.url }}" class="mr-3" alt="..." style="width: 8%; height: 8%;">
+                        <div class="media-body">
+                            <p style="text-align: left; margin-inline-start: 2px; "> Автор комментария {{ comment.user.username }}</p>
+                            <h5 style="text-align: left; margin-inline-start: 10px;">{{ comment.text }}</h5>
+                        </div>
+                    <p style="text-align: right; margin: 3px">Создан в {{ comment.date }}</p>
+                </div>
+
+            {% endfor %}
+        {% else %}
+            <p>Комментариев нет</p>
+        {% endif %}
+        </div>
+    </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends  'base.html' %}
+
+{% block main %}
+    <div class="card mt-3">
+        <div class="card-header">
+            {% if user.is_superuser %}
+                Список жалоб
+            {% else %}
+                Ваши жалобы
+            {% endif %}
+        </div>
+        <div class="card-body">
+            {% if user.is_superuser %}
+                {% if reports %}
+                    <div class="list-group">
+                        {% for report in reports %}
+                            {% if not report.closed %}
+                                <div class="card mt-2">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            Голосование -
+                                            <a href="/voting/{{ report.voting.id }}">{{ report.voting.text }}</a>
+                                        </h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">
+                                            Отправил -
+                                            <a href="/profile/{{ report.user.id }}">{{ report.user.username }}</a>
+                                        </h6>
+                                        <hr>
+                                        <h6 class="card-subtitle mb-2">Сообщение:</h6>
+                                        <p class="card-text">{{ report.message }}</p>
+                                        <hr>
+                                        <form method="post" action="/reports/{{ report.id }}/delete/">
+                                            {% csrf_token %}
+                                            <input type="submit" class="btn btn-primary float-right ml-2"
+                                                   value="Сделать рассмотреной">
+                                        </form>
+                                        <a href="/voting/{{ report.voting.id }}/edit/"
+                                           class="btn btn-primary float-right">Редактировать
+                                            голосование</a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>Жалоб нет</p>
+                {% endif %}
+            {% else %}
+                {% if user_reports %}
+                    {% for report in user_reports %}
+                        <div class="card mt-2">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Голосование -
+                                    <a href="/voting/{{ report.voting.id }}/">{{ report.voting.text }}</a>
+                                </h5>
+                                <h6 class="card-subtitle mb-2">
+                                    {% if report.closed %}
+                                        <p class="text-success">Рассмотрено</p>
+                                    {% else %}
+                                        <p class="text-danger">Не рассмотрено</p>
+                                    {% endif %}
+                                </h6>
+                                <hr>
+                                <h6 class="card-subtitle mb-2">Сообщение:</h6>
+                                <p class="card-text">{{ report.message }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    Вы не оставляли жалоб
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

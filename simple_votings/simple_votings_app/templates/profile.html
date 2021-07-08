@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="container">
+        <div class="card mt-3">
+            <div class="card-header text-center">
+                Профиль пользователя.
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3 ml-3">
+                        <div class="card">
+                            <div class="card-body">
+                                <img class="border rounded-circle mt-2 img-thumbnail"
+                                     src="{{ MEDIA_URL }}{{ profile.avatar.url }}"
+                                     style="display: block; margin: auto;">
+                                <hr>
+                                <p class="text-center">
+                                    {% if ufp.is_superuser %}
+                                        <span class="text-primary">(Admin)</span>
+                                    {% endif %}
+                                    {{ ufp.username }}
+                                </p>
+                                <hr>
+                                <p>Создан: {{ profile.good_joined_date }}</p>
+                                <p>Входил: {{ profile.good_login_date }}</p>
+                            </div>
+                        </div>
+                        {% if ufp == user %}
+                            <a class="btn btn-primary btn-sm btn-block mt-2" href="/profile/{{ ufp.id }}/edit/">
+                                Редактировать
+                            </a>
+                        {% endif %}
+                    </div>
+                    <div class="col ml-3">
+                        {% if ufp.first_name and ufp.last_name %}
+                            <h2><b>{{ ufp.first_name }} {{ ufp.last_name }}</b></h2>
+                        {% else %}
+                            <h2><b>{{ ufp.username }}</b></h2>
+                        {% endif %}
+                        <p class="text-secondary">
+                            {% if profile.job %}
+                                {{ profile.job }}
+                            {% else %}
+                                Место работы/учебы не указано
+                            {% endif %}
+                        </p>
+                        <hr>
+                        <p class="text-secondary">
+                            {% if profile.biography %}
+                                {{ profile.biography }}
+                            {% else %}
+                                Биография не указана
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-3 ml-3">
+                        <div class="row">
+                            <div class="col">
+                                <b>Статистика созданных голосований</b>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <b>{{ profile.votings_count }}</b><br>
+                                <small>голосований</small>
+                            </div>
+                            <div class="col">
+                                <b>{{ profile.likes_on_votings }}</b><br>
+                                <small>лайков</small>
+                            </div>
+                            <div class="col">
+                                <b>{{ profile.votes_on_votings }}</b><br>
+                                <small>голосов</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row ml-0">
+                            <img src="https://image.flaticon.com/icons/svg/1554/1554804.svg" width="20" height="20">
+                            <p class="text-secondary ml-1">{{ profile.get_gender_display }}</p>
+                        </div>
+                        <div class="row ml-0">
+                            <img src="https://image.flaticon.com/icons/svg/143/143960.svg" width="20" height="20">
+                            <p class="text-secondary ml-1">
+                                {% if profile.country %}
+                                    {{ profile.country }}
+                                {% else %}
+                                    Не указано
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="row ml-0">
+                            <img src="https://image.flaticon.com/icons/svg/1404/1404889.svg" width="20" height="20">
+                            <p class="text-secondary ml-1">
+                                {% if profile.birth %}
+                                    {{ profile.birth }}
+                                {% else %}
+                                    Не указано
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="row ml-0">
+                            <img src="https://image.flaticon.com/icons/svg/2089/2089065.svg" width="20" height="20">
+                            <p class="text-secondary ml-1">
+                                {% if ufp.email and profile.show_email %}
+                                    {{ ufp.email }}
+                                {% else %}
+                                    Скрыто
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-3 ml-3">
+                        <hr>
+                        <div class="list-group" id="list-tab" role="tablist">
+                            <a class="list-group-item list-group-item-action active d-flex justify-content-between align-items-center"
+                               id="list-votings-list"
+                               data-toggle="list" href="#list-votings" role="tab" aria-controls="votings">
+                                Голосования
+                                <span class="badge badge-primary badge-pill">{{ profile.votings_count }}</span>
+                            </a>
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                               id="list-votes-list" data-toggle="list"
+                               href="#list-votes" role="tab" aria-controls="votes">
+                                Голоса
+                                <span class="badge badge-primary badge-pill">{{ profile.votes_count }}</span>
+                            </a>
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                               id="list-likes-list" data-toggle="list"
+                               href="#list-likes" role="tab" aria-controls="likes">
+                                Лайки
+                                <span class="badge badge-primary badge-pill">{{ profile.likes_count }}</span>
+                            </a>
+                            <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                               id="list-comments-list" data-toggle="list"
+                               href="#list-comments" role="tab" aria-controls="comments">
+                                Комментарии
+                                <span class="badge badge-primary badge-pill">{{ profile.comments_count }}</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <hr>
+                        <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade show active" id="list-votings" role="tabpanel"
+                                 aria-labelledby="list-votings-list">
+                                {% if profile.votings_count == 0 %}
+                                    <h3>Пусто</h3>
+                                {% else %}
+                                    {% for voting in profile.votings %}
+                                        <div class="list-group mt-2">
+                                            <a href="/voting/{{ voting.id }}/"
+                                               class="list-group-item list-group-item-action">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h5 class="mb-1">Тип голосования - {{ voting.type }}</h5>
+                                                    <small>{{ voting.likes_count }} лайков</small>
+                                                </div>
+                                                <h5 class="mb-1">{{ voting.text }}</h5>
+                                                <small>Создано {{ voting.start_time }}</small>
+                                                {% if voting.end_time %}
+                                                    <small class="ml-3">Заканчивается {{ voting.end_time }}</small>
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="tab-pane fade" id="list-votes" role="tabpanel"
+                                 aria-labelledby="list-votes-list">
+                                {% if profile.votes_count == 0 %}
+                                    <h3>Пусто</h3>
+                                {% else %}
+                                    {% for vote in profile.votes %}
+                                        <div class="list-group mt-2">
+                                            <a href="/voting/{{ vote.answer.voting.id }}/"
+                                               class="list-group-item list-group-item-action">
+                                                <h5 class="mb-1">
+                                                    Проголосовал за {{ vote.answer.text }} в голосовании
+                                                    {{ vote.answer.voting.text }}
+                                                </h5>
+                                                <small>в {{ vote.date }}</small>
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="tab-pane fade" id="list-likes" role="tabpanel"
+                                 aria-labelledby="list-likes-list">
+                                {% if profile.likes_count == 0 %}
+                                    <h3>Пусто</h3>
+                                {% else %}
+                                    {% for like in profile.likes %}
+                                        <div class="list-group mt-2">
+                                            <a href="/voting/{{ like.voting.id }}/"
+                                               class="list-group-item list-group-item-action">
+                                                <h5 class="mb-1">
+                                                    Лайкнул голосование {{ like.voting.text }}
+                                                </h5>
+                                                <small>в {{ like.date }}</small>
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                            <div class="tab-pane fade" id="list-comments" role="tabpanel"
+                                 aria-labelledby="list-comments-list">
+                                {% if profile.comments_count == 0 %}
+                                    <h3>Пусто</h3>
+                                {% else %}
+                                    {% for comment in profile.comments %}
+                                        <div class="list-group mt-2">
+                                            <a href="/voting/{{ comment.voting.id }}/"
+                                               class="list-group-item list-group-item-action">
+                                                <h5 class="mb-1">
+                                                    Оставил комментарий
+                                                </h5>
+                                                <p class="mb-1">
+                                                    {{ comment.text }}
+                                                </p>
+                                                <p class="mb-1">
+                                                    под голосованием {{ comment.voting.text }}
+                                                </p>
+                                                <small>в {{ comment.date }}</small>
+                                            </a>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

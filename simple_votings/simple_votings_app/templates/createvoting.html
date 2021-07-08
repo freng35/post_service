@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block main %}
+    <div class="card mt-3">
+        <div class="card-header text-center">
+            Создание голосования
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group w-75 mx-auto">
+                        {% if errors %}
+                            <div class="alert alert-danger" role="alert">
+                                <ul>
+                                {% for i in errors %}
+                                    <li>{{ i }}</li>
+                                {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <form method="post" action="/create/">
+                            {% csrf_token %}
+                            <input type="text" class="form-control" placeholder="Ваш опрос" name="question">
+                            <div id="common_div" class="mt-3">
+                                <div class="input-group mb-3 w-75" id="answer">
+                                    <input type="text" class="form-control" name="answer" placeholder="Ваш ответ">
+                                    <div class="input-group-append">
+                                        <input type="button" class="btn btn-outline-danger" value="-"
+                                               onclick="remove_ans(this)">
+                                    </div>
+                                </div>
+                                <div class="input-group mb-3 w-75">
+                                    <input type="text" class="form-control" name="answer" placeholder="Ваш ответ">
+                                    <div class="input-group-append">
+                                        <input type="button" class="btn btn-outline-danger" value="-"
+                                               onclick="remove_ans(this)">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <input type="button" onclick="add()" value="+"
+                                   class="btn btn-outline-success mt-2 btn-block">
+                            <hr>
+                            <input type="date" class="form-control" placeholder="Дата окончания" name="end_time">
+                            <small>Не обязательное поле</small><br>
+                            <input type="checkbox" name="is_multiple" class="mt-3">
+                            <span>Разрешить множественный выбор <br></span>
+                            <input type="checkbox" name="is_anonymous_allowed" class="mt-3">
+                            <span>Разрешить анонимное голосование</span>
+                            <hr>
+                            <input type="submit" class="btn btn-primary" value="Создать">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function add() {
+            if (common_div.children.length < 25) {
+                let el = document.getElementById('answer').cloneNode(true);
+                el.children[0].value = '';
+                common_div.appendChild(el);
+            }
+        }
+
+        function remove_ans(obj) {
+            if (common_div.children.length > 2) {
+                obj.parentNode.parentNode.remove();
+            }
+        }
+    </script>
+{% endblock %}

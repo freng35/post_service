@@ -1,0 +1,33 @@
+{% extends  'base.html' %}
+
+{% block main %}
+    <div class="card mt-3">
+        <div class="card-header">
+            Отправить жалобу
+        </div>
+        <div class="card-body">
+            <form method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {% if errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {% for i in errors %}
+                                <p>{{ i }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if thanks %}
+                        <div class="alert alert-success" role="alert">
+                            {{ thanks }}
+                        </div>
+                    {% endif %}
+                    <label for="exampleFormControlTextarea1">
+                        Опишите суть жалобы (ненормативная лексика, расизм и т.д.)
+                    </label>
+                    <textarea class="form-control" name="message"></textarea>
+                </div>
+                <input type="submit" value="Отправить" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+{% endblock %}
